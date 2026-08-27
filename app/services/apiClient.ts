@@ -34,5 +34,6 @@ export function useApiClient() {
     post: <T>(path: string, body: Record<string, unknown>) => request<T>(path, { method: 'POST', body }),
     put: <T>(path: string, body: Record<string, unknown>) => request<T>(path, { method: 'PUT', body }),
     delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
+    upload: <T>(path: string, blob: Blob, fileName: string) => request<T>(path, { method: 'POST', body: blob, headers: { 'Content-Type': blob.type, 'X-File-Name': encodeURIComponent(fileName) }, timeout: 60_000 }),
   }
 }

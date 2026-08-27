@@ -12,3 +12,8 @@ test('display route is available', async ({ page }) => {
   await page.goto('/display')
   await expect(page.locator('body')).toBeVisible()
 })
+
+test('public gallery route renders a safe empty state', async ({ page }) => {
+  await page.goto('/gallery/demo-event?token=demo-token')
+  await expect(page.getByRole('heading', { name: 'Galeri Foto' })).toBeVisible()
+})

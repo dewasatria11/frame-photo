@@ -2,6 +2,9 @@ name = "lensflow-api"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 
+[triggers]
+crons = ["0 3 * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "lensflow"

@@ -1,7 +1,6 @@
 import { DEFAULT_SETTINGS } from './defaults'
-import type { AppSettings, SafeFont } from '../types'
+import type { AppSettings } from '../types'
 
-const FONTS: SafeFont[] = ['Inter', 'Arial', 'Georgia', 'Times New Roman', 'system-ui']
 const number = (value: unknown, fallback: number, min: number, max: number) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback
 
 export function normalizeSettings(value: unknown): AppSettings {
@@ -21,7 +20,6 @@ export function normalizeSettings(value: unknown): AppSettings {
       ...(output.maxWidth ? { maxWidth: number(output.maxWidth, 0, 1, 20000) } : {}), ...(output.maxHeight ? { maxHeight: number(output.maxHeight, 0, 1, 20000) } : {}),
     },
     watcher: { intervalMs: number(input.watcher?.intervalMs, 2000, 500, 60000), stabilityDelayMs: number(input.watcher?.stabilityDelayMs, 750, 500, 5000), concurrency: [1, 2, 3].includes(input.watcher?.concurrency ?? 0) ? input.watcher!.concurrency : 1 },
-    watermark: { layers: (input.watermark?.layers ?? []).filter((layer) => layer && FONTS.includes(layer.type === 'text' ? layer.fontFamily : 'Inter')), output: { ...DEFAULT_SETTINGS.output, ...output } },
+    watermark: { layers: (input.watermark?.layers ?? []).filter((layer) => layer?.type === 'frame'), output: { ...DEFAULT_SETTINGS.output, ...output } },
   }
 }
-

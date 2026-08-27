@@ -1,33 +1,26 @@
 <script setup lang="ts">
 type Layer = Record<string, any>
 const props = defineProps<{ layers: Layer[]; selectedId?: string; output: Record<string, any> }>()
-const emit = defineEmits<{ updateLayer: [id: string, patch: Record<string, any>]; select: [id: string]; addImage: [file: File, kind: 'image'|'frame']; addText: []; remove: [id: string]; updateOutput: [patch: Record<string, any>] }>()
+const emit = defineEmits<{ updateLayer: [id: string, patch: Record<string, any>]; select: [id: string]; addImage: [file: File, kind: 'frame']; remove: [id: string]; updateOutput: [patch: Record<string, any>] }>()
 const tab = ref<'layers'|'output'>('layers')
 const active = computed(() => props.layers.find(l => l.id === props.selectedId) || props.layers[0])
 const fileInput = ref<HTMLInputElement>()
-const assetKind = ref<'image'|'frame'>('image')
-const positions = ['top-left','top-center','top-right','middle-left','center','middle-right','bottom-left','bottom-center','bottom-right']
-function choose(kind: 'image'|'frame') { assetKind.value = kind; fileInput.value?.click() }
-function filePicked(e: Event) { const f = (e.target as HTMLInputElement).files?.[0]; if (f) emit('addImage', f, assetKind.value); (e.target as HTMLInputElement).value = '' }
+function chooseFrame() { fileInput.value?.click() }
+function filePicked(e: Event) { const f = (e.target as HTMLInputElement).files?.[0]; if (f) emit('addImage', f, 'frame'); (e.target as HTMLInputElement).value = '' }
 function patch(key: string, value: any) { if (active.value) emit('updateLayer', active.value.id, { [key]: value }) }
 </script>
 <template>
   <section class="card designer" aria-labelledby="designer-heading">
     <div class="card-heading compact"><div><div class="eyebrow">Langkah 2</div><h2 id="designer-heading">Desainer Watermark</h2></div><div class="segmented small"><button :class="{ active: tab==='layers' }" @click="tab='layers'">Layer</button><button :class="{ active: tab==='output' }" @click="tab='output'">Output</button></div></div>
     <template v-if="tab === 'layers'">
-      <div class="layer-actions"><button class="btn btn-secondary" @click="choose('image')"><AppIcon name="upload" />Logo</button><button class="btn btn-secondary" @click="choose('frame')"><AppIcon name="image" />Frame</button><button class="btn btn-secondary" @click="emit('addText')">Teks</button><input ref="fileInput" class="sr-only" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" @change="filePicked"></div>
+      <div class="layer-actions"><button class="btn btn-secondary" @click="chooseFrame"><AppIcon name="image" />Unggah Frame</button><input ref="fileInput" class="sr-only" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" @change="filePicked"></div>
       <div v-if="layers.length" class="layer-list" aria-label="Daftar layer">
-        <button v-for="layer in layers" :key="layer.id" :class="['layer-row', { active: layer.id === active?.id }]" @click="emit('select', layer.id)"><span class="layer-type">{{ layer.type === 'frame' ? 'FR' : layer.type === 'text' ? 'T' : 'LG' }}</span><span><strong>{{ layer.name || (layer.type === 'text' ? layer.text : 'Layer watermark') }}</strong><small>{{ layer.enabled === false ? 'Dinonaktifkan' : 'Aktif' }}</small></span><input :checked="layer.enabled !== false" type="checkbox" :aria-label="`Aktifkan ${layer.name || 'layer'}`" @click.stop @change="emit('updateLayer', layer.id, { enabled: ($event.target as HTMLInputElement).checked })"></button>
+        <button v-for="layer in layers" :key="layer.id" :class="['layer-row', { active: layer.id === active?.id }]" @click="emit('select', layer.id)"><span class="layer-type">FR</span><span><strong>{{ layer.name || 'Frame watermark' }}</strong><small>{{ layer.enabled === false ? 'Dinonaktifkan' : 'Aktif' }}</small></span><input :checked="layer.enabled !== false" type="checkbox" :aria-label="`Aktifkan ${layer.name || 'frame'}`" @click.stop @change="emit('updateLayer', layer.id, { enabled: ($event.target as HTMLInputElement).checked })"></button>
       </div>
-      <div v-else class="compact-empty"><AppIcon name="image" /><strong>Belum ada watermark</strong><span>Tambahkan logo, frame, atau teks manual.</span></div>
+      <div v-else class="compact-empty"><AppIcon name="image" /><strong>Belum ada frame</strong><span>Unggah PNG transparan dengan rasio yang sama seperti foto.</span></div>
       <div v-if="active" class="control-stack">
-        <div v-if="active.type === 'text'" class="field-group"><label for="layer-text">Isi teks</label><input id="layer-text" :value="active.text" maxlength="160" placeholder="Nama event atau studio" @input="patch('text', ($event.target as HTMLInputElement).value)"><div class="control-columns"><select :value="active.fontFamily || 'Inter'" aria-label="Jenis font" @change="patch('fontFamily', ($event.target as HTMLSelectElement).value)"><option>Inter</option><option>Arial</option><option>Georgia</option><option>Times New Roman</option><option>system-ui</option></select><input type="color" :value="active.color || '#ffffff'" aria-label="Warna teks" @input="patch('color', ($event.target as HTMLInputElement).value)"></div></div>
-        <label class="range-control"><span>{{ active.type === 'text' ? 'Ukuran' : 'Skala' }} <output>{{ active.type === 'text' ? (active.fontSize || 48)+' px' : Math.round((active.scale ?? .25)*100)+'%' }}</output></span><input type="range" :min="active.type === 'text' ? 12 : 5" :max="active.type === 'text' ? 240 : 100" :value="active.type === 'text' ? (active.fontSize || 48) : ((active.scale ?? .25)*100)" @input="patch(active.type === 'text' ? 'fontSize' : 'scale', active.type === 'text' ? Number(($event.target as HTMLInputElement).value) : Number(($event.target as HTMLInputElement).value)/100)"></label>
         <label class="range-control"><span>Opasitas <output>{{ Math.round((active.opacity ?? .85)*100) }}%</output></span><input type="range" min="0" max="100" :value="(active.opacity ?? .85)*100" @input="patch('opacity', Number(($event.target as HTMLInputElement).value)/100)"></label>
-        <label v-if="active.type !== 'frame'" class="range-control"><span>Margin tepi <output>{{ active.margin ?? 30 }} px</output></span><input type="range" min="0" max="300" :value="active.margin ?? 30" @input="patch('margin', Number(($event.target as HTMLInputElement).value))"></label>
-        <label v-if="active.type !== 'frame'" class="range-control"><span>Rotasi <output>{{ active.rotation ?? 0 }}°</output></span><input type="range" min="-180" max="180" :value="active.rotation ?? 0" @input="patch('rotation', Number(($event.target as HTMLInputElement).value))"></label>
-        <div v-if="active.type === 'frame'" class="field-group"><label for="frame-fit">Penyesuaian frame</label><select id="frame-fit" :value="active.fit || 'fit'" @change="patch('fit', ($event.target as HTMLSelectElement).value)"><option value="fit">Fit</option><option value="cover">Cover</option><option value="stretch">Stretch</option></select></div>
-        <fieldset v-else class="position-field"><legend>Posisi</legend><div class="position-grid"><button v-for="position in positions" :key="position" :class="{ active: active.position === position }" :aria-label="`Posisi ${position}`" :aria-pressed="active.position === position" @click="patch('position', position)"><span /></button></div></fieldset>
+        <div class="field-group"><label for="frame-fit">Penyesuaian frame</label><select id="frame-fit" :value="active.fit || 'fit'" @change="patch('fit', ($event.target as HTMLSelectElement).value)"><option value="fit">Fit — seluruh frame terlihat</option><option value="cover">Cover — memenuhi foto</option><option value="stretch">Stretch — tepat ukuran foto</option></select></div>
         <button class="btn btn-ghost danger-text remove-layer" @click="emit('remove', active.id)"><AppIcon name="trash" />Hapus layer</button>
       </div>
     </template>
@@ -38,4 +31,3 @@ function patch(key: string, value: any) { if (active.value) emit('updateLayer', 
     </div>
   </section>
 </template>
-

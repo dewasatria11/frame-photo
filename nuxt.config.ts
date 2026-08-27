@@ -31,7 +31,7 @@ export default defineNuxtConfig({
           'x-content-type-options': 'nosniff',
           'referrer-policy': 'strict-origin-when-cross-origin',
           'permissions-policy': 'camera=(), microphone=(), geolocation=()',
-          'content-security-policy': "default-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https: http://localhost:8787; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+          'content-security-policy': "default-src 'self'; img-src 'self' blob: data: https://*.workers.dev; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https: http://localhost:8787; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
         },
       },
     },

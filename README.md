@@ -138,3 +138,11 @@ Foto diproses secara lokal di perangkat secara default dan tidak dikirim ke laya
 ## Operational notes
 
 Object URL hasil hanya dipertahankan untuk galeri terbaru dan dilepas saat tidak dipakai. Log cloud berupa ringkasan job, bukan setiap baris console. Untuk event panjang, pertahankan concurrency 1 dan galeri maksimum agar penggunaan memori stabil.
+
+## Cloud Gallery dan QR event
+
+Operator membuat event dari kartu **Cloud Gallery & QR**. Setiap output ber-frame tetap disimpan penuh ke folder lokal dan salinan JPEG maksimal 3000 px (quality 87%) masuk antrean IndexedDB untuk di-upload ke R2. Koneksi yang terputus tidak menghentikan Auto-Watch; antrean dilanjutkan ketika browser kembali online.
+
+QR mengarah ke `/gallery/{eventId}?token={token}`. Bucket tetap private dan Worker memvalidasi hash token sebelum memberikan daftar atau binary foto. Token tersimpan lokal pada workstation operator, sedangkan D1 hanya menyimpan hash. Event kedaluwarsa beserta object R2 dibersihkan setiap hari pukul 03:00 UTC oleh Cron Trigger Worker.
+
+Route `/display` menampilkan QR kecil di kanan bawah. Setelah 20 detik tanpa foto baru, QR membesar otomatis. Tekan `Q` untuk mengganti ukuran QR dan `F` untuk fullscreen. Gunakan mode display **Extend** agar dashboard tetap berada di laptop dan `/display` berada di monitor kedua.
