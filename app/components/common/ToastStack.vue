@@ -1,0 +1,2 @@
+<script setup lang="ts">defineProps<{ items: {id:string; message:string; type?:string}[] }>(); defineEmits<{ dismiss:[id:string] }>()</script>
+<template><div class="toast-stack" aria-live="polite"><TransitionGroup name="toast"><div v-for="item in items" :key="item.id" :class="['toast-item', item.type || 'success']"><AppIcon :name="item.type === 'error' ? 'info' : 'check'" /><span>{{ item.message }}</span><button aria-label="Tutup notifikasi" @click="$emit('dismiss', item.id)"><AppIcon name="close" :size="14" /></button></div></TransitionGroup></div></template>

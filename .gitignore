@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+dist
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler
+.DS_Store
+*.log
+playwright-report
+test-results
+coverage
