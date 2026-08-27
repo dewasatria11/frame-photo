@@ -8,7 +8,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'LensFlow Watermark Pro',
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || '',
+      apiBase:
+        process.env.NUXT_PUBLIC_API_BASE ||
+        'https://lensflow-api.al-ikhsan-media.workers.dev',
     },
   },
   app: {

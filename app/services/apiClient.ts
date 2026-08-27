@@ -25,6 +25,12 @@ export function useApiClient() {
       return envelope.data as T
     } catch (error) {
       if (error instanceof ApiError) throw error
+      const response = (error as { data?: unknown; response?: { status?: number; _data?: unknown } })?.response
+      const payload = response?._data ?? (error as { data?: unknown })?.data
+      const parsed = envelopeSchema.safeParse(payload)
+      if (parsed.success && !parsed.data.ok) {
+        throw new ApiError(parsed.data.error.code, parsed.data.error.message, response?.status)
+      }
       throw new ApiError('NETWORK_ERROR', 'API cloud tidak dapat dijangkau. Pemrosesan lokal tetap tersedia.')
     }
   }

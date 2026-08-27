@@ -42,7 +42,7 @@ npm run db:migrate:local
 npm run dev
 ```
 
-Set `NUXT_PUBLIC_API_BASE=http://localhost:8787`. Bila variabel kosong atau Worker mati, fungsi lokal tetap berjalan.
+Secara default aplikasi memakai Worker production di `https://lensflow-api.al-ikhsan-media.workers.dev`. Untuk pengembangan Worker lokal, override dengan `NUXT_PUBLIC_API_BASE=http://localhost:8787`. Bila Worker mati, fungsi lokal tetap berjalan.
 
 ## Cloudflare D1 setup
 
