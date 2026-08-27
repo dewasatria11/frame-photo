@@ -22,6 +22,21 @@ function origins(raw: string | undefined): Set<string> {
   );
 }
 
+function isLoopbackOrigin(origin: string | undefined): boolean {
+  if (!origin) return false;
+  try {
+    const url = new URL(origin);
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      (url.hostname === "localhost" ||
+        url.hostname === "127.0.0.1" ||
+        url.hostname === "[::1]")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export const security = createMiddleware<AppEnv>(async (c, next) => {
   const requestId = crypto.randomUUID();
   c.set("requestId", requestId);
@@ -36,7 +51,7 @@ export const security = createMiddleware<AppEnv>(async (c, next) => {
 
   const allowed = origins(c.env.ALLOWED_ORIGINS);
   const origin = c.req.header("origin");
-  const isAllowed = !!origin && allowed.has(origin);
+  const isAllowed = !!origin && (allowed.has(origin) || isLoopbackOrigin(origin));
   if (origin && isAllowed) {
     c.header("Access-Control-Allow-Origin", origin);
     c.header("Vary", "Origin");
