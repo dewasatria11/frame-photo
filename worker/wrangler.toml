@@ -5,7 +5,7 @@ compatibility_date = "2026-08-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "lensflow"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "720dc46d-a908-4975-bf1f-141dd9ad434d"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
